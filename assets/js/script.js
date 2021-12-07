@@ -28,12 +28,12 @@ function getCountryInfo(country, timeSpan) {
         url: `https://corona-api.com/countries/${country}`,
         dataType: "json",
         async: true,
-        success: function (data) {
+        success: function (data) { // En caso de consulta exitosa se ejecuta esto
             renderCountryData(data.data, timeSpan)
-            if ($("#table-data")) {
+            if ($("#table-data") !== "undefined") {
                 renderCountryTable(data.data, timeSpan);
             }
-        }, // En caso de consulta exitosa se ejecuta esto
+        }, 
         error: function () { errorMessage() },
     });
 }
@@ -92,6 +92,7 @@ function createArr(data, timeSpan) {
             });
         }
     }
+    
     return timeline; // Así los ordenamos desde la fecha más antigua a la más reciente
 }
 
@@ -103,11 +104,18 @@ function renderCountryTable(data, timeSpan) {
     // Obtenemos los datos filtrados
     let timeline = createArr(data, timeSpan);
 
-    for (let i = 0; i < timeSpan; i++) {
-        // devolvemos los datos a su orden original
-        $("#table-data").append(`<tr><td>${(timeline[0].reverse())[i].label}</td>
-        <td>${(timeline[0].reverse())[i].y}</td>
-        <td>${(timeline[1].reverse())[i].y}</td></tr>`);
+    // devolvemos los datos a su orden original
+    timeline[0].reverse();
+    timeline[1].reverse();
+
+    let date_newCases;
+    let date_newDeaths;
+    for (let i = 0; i < timeSpan; i++) {  
+        date_newCases = timeline[0][i];
+        date_newDeaths = timeline[1][i];
+        $("#table-data").append(`<tr><td>${date_newCases.label}</td>
+        <td>${date_newCases.y}</td>
+        <td>${date_newDeaths.y}</td></tr>`);
     }
 }
 
@@ -125,7 +133,7 @@ $(document).ready(function () {
     });
 
     // Si estamos en peru.html
-    if (location.pathname == "/peru.html") {
+    if (window.location.href.includes("/peru.html")) {
         getCountryInfo("PE", 30);
     }
 });
